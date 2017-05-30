@@ -1,0 +1,201 @@
+---
+title: "Week05 Assignment"
+author: "Sophie Kim"
+date: "March 20, 2016"
+output: html_document
+---
+--------------------------------------------------------------------------------------------------------------
+
+
+#1 Once in a lifetime chance…
+
+In a hospital, human births occur randomly throughout the day at a rate of 0.8 births per hour. Without using dpois(), calculate the exact probability of having 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, or 10 births in any given hour.
+
+```{r}
+
+lambda <- 0.80
+
+prob_results <- c()
+
+for (k in 0:10) {
+  prob <- exp(-lambda)*(lambda^k)/factorial(k)
+  prob_results[k + 1] <- prob
+}
+
+prob_results
+
+
+
+```
+
+
+
+#2 Fishy statistics
+
+>> Same distribution and same mean:
+
+```{r}
+
+dataV <- c(0,3,5,7,10,13,15,17,20)
+
+plot(dataV,dpois(dataV,10),col="red",pch="T",ylab="Probablity Density",main="Probability Distributions")
+points(dataV,dbinom(dataV,1000,0.010),col="blue",pch="U")
+legend("topright", c("Poisson","Binomial"), pch=c("T","U"),col=c("green","blue"))
+
+```
+
+
+
+>> Same mean but different distribution:
+
+```{r}
+
+plot(dataV,dpois(dataV,10),col="red",pch="T",ylab="Probablity Density",main="Probability Distributions")
+points(dataV,dbinom(dataV,100,0.020),col="blue",pch="U")
+legend("topright", c("Poisson","Binomial"), pch=c("T","U"),col=c("green","blue"))
+
+```
+
+
+
+
+#3 A CAN of Chi tea
+
+
+> Hypothesis test 1: Are the mutations uniformly distributed along the length of the gene? For example, are mutations in the first fifth just as likely as mutations in the last fifth?
+
+- Null hypothesis: The mutations are not uniformly distributed along the length of the gene.
+
+
+
+
+
+```{r}
+
+data <- read.table("CAN1sequencing.txt", head = TRUE)
+
+
+obs1 <- c()
+
+for (k in 1:10) {
+  obs1[k] <- sum(data$Mutations[(59*k-58):(59*k)])
+}
+
+
+exp1 <- (sum(data$Mutations)/10)
+
+chiSum1 <- 0
+
+for (k in 1:10) {
+  chiValue1 <- ((obs1[k]-exp1)^2)/exp1
+  chiSum1 <- chiSum1 + chiValue1
+}
+
+
+chiSum1
+
+1-pchisq(chiSum1,df=1)
+
+
+
+```
+
+Since p-value < 0.05, reject the null.
+
+Therefore, the mutations are uniformly distributed distributed along the length of the gene.
+
+
+
+> Hypothesis test 2: Are the mutations randomly distributed for each individual codon, ie how many codons would we expect to see with 0 mutations? How many would we expect to have 1, 2 mutations? Etc.
+
+- Null hypothesis: The mutations are not randomly distributed for each individual codon.
+
+
+-- mut0: codons where 0 mutations occurred
+
+-- mut1: codons where 1 mutation occurred
+
+-- mut2: codons where 2 mutations occurred
+
+-- mut3: codons where 3 or more mutations occurred
+
+
+```{r}
+
+mut0 <- subset(data, Mutations == 0)
+mut1 <- subset(data, Mutations == 1)
+mut2 <- subset(data, Mutations == 2)
+mut3 <- subset(data, Mutations >= 3)
+
+obs <- c(length(mut0$Codon), length(mut1$Codon), length(mut2$Codon), length(mut3$Codon))
+
+obs
+
+sub0 <- subset(data, Mutations == 0)
+sub1 <- subset(data, Mutations != 0)
+
+lambda <- sum(data$Mutations)/length(data$Mutations)
+
+exp <- c(dpois(0, lambda)*590, dpois(1, lambda)*590, dpois(2, lambda)*590,  sum(dpois(3:8, lambda))*590)
+
+chiSum <- 0
+
+for (k in 1:4) {
+  chiValue <- ((obs[k]-exp[k])^2)/exp[k]
+  chiSum <- chiSum + chiValue
+}
+
+chiSum
+
+1-pchisq(chiSum,df=1)
+
+```
+
+
+Since p-value = 0, there is no chance of obtaining a test statistic this extreme or more extreme, so reject the null.
+
+Therefore, the mutations are randomly distributed for each individual codon.
+
+
+
+
+#4 Taking on more of a homework LOD, but over three weeks
+
+Identify which child(ren) represent(s) the recombinants between the marker and the disease-causing loci:
+
+- Recombinants: Kid3
+
+
+
+Do the LOD scores provide evidence for or against linkage?
+
+```{r}
+
+LODscore <- log10(((1/7^1) * ((6/7)^6) / (0.5^7)))
+
+likeliness <- 10^LODscore
+
+likeliness
+
+```
+
+-- As shown in the calculation, the LOD score is 0.2783963, which means that there is a 10^LODscore, or 1.898438 times more likelihood of this gene being linked than not. Therefore, it is for linkage.
+
+
+
+Plot the log-likelihood profile for at least 200 values of theta:
+
+```{r}
+
+k <- (0:200)/200
+
+LODscore <- log10((k * ((1-k)^6) / (0.5^7)))
+
+likeliness <- 10^LODscore
+
+plot(k, LODscore, type="l",xlab="recombination fraction",ylab="log-likelihood",main="Likelihood Profile")
+
+```
+
+
+-- The plot shows that for recombination fraction < 0.5, it is a positive constant times likely that the genes are linked. Therefore the LOD scores provide evidence for linkage.
