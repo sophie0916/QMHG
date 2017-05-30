@@ -1,0 +1,181 @@
+---
+title: "Week03 Assignment"
+author: "Sophie Kim"
+date: "February 22, 2016"
+output: html_document
+---
+-------------------------------------------------------------------------------------------------------------
+
+#1. Plotting Perfect Pedigrees
+
+```{r}
+
+pedDF <- data.frame(
+  id = c("Levi", "Leona", "Rosalynne", "Skylar", "Leroy", "Gina", "Floyd", "Matt", "Austin", "Jacklyn"),
+  dadid = c(NA, NA, "Levi", "Levi", "Levi", "Levi", NA, "Leroy", "Leroy", "Floyd"),
+  momid = c(NA, NA, "Leona", "Leona", "Leona", "Leona", NA, "Skylar", "Skylar", "Gina"), 
+  sex = c("male", "female", "female", "female", "male", "female", "male", "male", "male", "female"),
+  affected = c(F, F, T, F, F, T, F, T, T, F)
+)
+
+
+pedigreeObject <- with(pedDF, pedigree(id,dadid,momid,sex,affected))
+
+plot(pedigreeObject)
+
+```
+
+
+#2. Relative Risk
+
+*Relative risk of genotype AA for developing ATEMC: refers to having the group of AA positive for ATEMC relative to every other group
+
+```{r}
+AApos <- 950
+AAtot <- 950 + 50
+
+ABpos <- 380
+ABtot <- 380 + 220
+BBpos <- 50
+BBtot <- 50 + 350
+
+RR <- (AApos/AAtot) / ((ABpos + BBpos)/(ABtot + BBtot))
+
+RR
+
+```
+
+
+#3. Heads over Tails with the Binomial Distribution
+
+- Calculate the probabilities of having specifically the first 0, 1, 2, …, 23, 24 children having the disease phenotype, and store this in a vector of length 25 positions. For example, for two affected children this would be the probability of having specifically the first two children affected and specifically the last 22 children unaffected.
+```{r}
+
+n <- 24
+p <- 0.25
+
+prob_results <- c()
+
+for (k in 0:24) {
+  prob <- (p^k) * (1-p)^(n-k)
+  prob_results[k + 1] <- prob
+}
+
+prob_results
+
+```
+
+- Calculate the binomial coefficients for this series, and store this in a vector of length 25 positions. This describe the possible ways to have each number of children affected (0, 1, 2, … , 23, 24), for example the possible ways to have two affected children out of 24. ! doesn’t calculate the factorial, factorial() does.
+```{r}
+
+binom_results <- c()
+
+for (k in 0:24) {
+  binomC <- factorial(n) / (factorial(k) * factorial(n-k))
+  binom_results[k + 1] <- binomC
+}
+
+binom_results
+
+```
+
+- Use these two results to calculate the exact probabilities of having 0, 1, 2, …, 23, 24 affected children from this cross. Remember how we have used vectors previously to do tedious repetative calculations. Your results should match your calculations from dbinom() below.
+```{r}
+
+exact_prob <- prob_results * binom_results
+
+exact_prob
+
+```
+
+- Store these three calculation results in a data.frame.
+```{r}
+
+results <- data.frame(
+  prob_results,
+  binom_results,
+  exact_prob
+)
+
+results
+
+```
+
+- Use the plot() function to plot the number of children affected (0 through 24) on the x versus each of these three calculations on the y. Use a different plot for each one. Label the axis appropriately with the xlab and ylab arguments.
+
+```{r}
+
+plot(0:24, prob_results, xlab = "Number of Children Affected", ylab = "Probability",  main = "Probability of Having the First n Affected Children")
+
+plot(0:24, binom_results, xlab = "Number of Children Affected", ylab = "Binomial Coefficients",  main = "Possible Ways of Having the First n Affected Children")
+
+plot(0:24, exact_prob, xlab = "Number of Children Affected", ylab = "Probability",  main = "Exact Probability of Having the First n Affected Children")
+
+```
+
+
+#4. dbinom() unlocked
+
+* Check your results of the third and final probability by using the dbinom() function, setting parameters x=, size=, and prob= appropriately. 
+```{r}
+
+dbinom(0:24, n, p)
+
+```
+Disease A is inherited in an autosomal recessive manner and Disease B is an X-linked recessive trait. Lower-case letters denote the recessive disease allele, capital letters are the dominant allele contributing to a wild-type phenotype.
+
+A man with genotype AabY (heterozygous for the allele associated with Disease A, with one X chromosome with the recessive allele associated with Disease B) and a woman AaBb (heterozygous for the allele associated with Disease A, with one dominant and one recessive allele for Disease B) plan to have 8 (eight) children. For the sex chromosomes, assume that you only get XX or XY children.
+
+Calculate the probability that none of the children will be affected with either Disease A or Disease B.
+
+```{r}
+
+dbinom(0, 8, 1/4) * dbinom(0, 8, 1/2)
+
+```
+
+Calculate the probability that all the children will have both Disease A and Disease B.
+
+```{r}
+
+dbinom(8, 8, 1/4) * dbinom(8, 8, 1/2)
+
+```
+
+Calculate the probability that exactly four children will have Disease A and exactly four children will have Disease B.
+
+```{r}
+
+probA <- ((1/4)*(1/2))^4
+probB <- ((3/4)*(1/2))^4
+binomC <- factorial(8)/(factorial(4)*factorial(4)) 
+
+result <- binomC * probA * probB
+
+result
+
+```
+
+Calculate and tell me the most probable outcome, in terms of the disease state of the eight children (how many with A, how many with B).
+
+```{r}
+
+dbinom(0:8, 8, 1/4)
+
+dbinom(0:8, 8, 1/2)
+
+plot(0:8, dbinom(0:8, 8, 1/4))
+
+plot(0:8, dbinom(0:8, 8, 1/2))
+
+```
+
+*Plotting dbinom for each of the disease provides visualization the data. Observations imply that 2 children being affected by disease A was the most probable, whereas for disease B, 4 children being affected was the most probable. Since these two are independent events, multiplying the probabilities will yield the probability of the most likely outcome, where 2 of the 8 children are affected by disease A and 4 of them are affected by disease B.
+
+```{r}
+
+mostP <- dbinom(2, 8, 1/4) * dbinom(4, 8, 1/2)
+
+mostP
+
+```
