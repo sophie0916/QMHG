@@ -1,0 +1,77 @@
+---
+title: "Week02 Recitation"
+output: html_document
+---
+-------------------------------------------------------------------------------------------
+
+
+```{r}
+
+
+dchisq(x=2, df=1)
+curve(x^2)
+curve(x^2, from=-5, to=5)
+dchil <- function(x){dchisq(x,df=1)}
+dchil(2)
+curve(dchil, from = -5, to = 5)
+dchi <- function(x){dchisq(x, df = 5)}
+dchi(5)
+
+curve(dchi, from = 0, to = 5)
+
+pchi <- function(x){return (pchisq(x, df = 5))}
+curve(pchi, from=0, to=5)
+curve(pchi, from=0, to=10)
+curve(dchi, from=0, to=10)
+
+print("cumulative density: keeps track of the ")
+
+pchisq(q=10, df=5)
+print("what is the chance we'll observe a statistic less than/ more extreme than this value(10) --> pvalue")
+
+qchisq(p=0.95, df=5)
+
+
+
+```
+
+pchisq: cumulative(I give it a quantile and it gives a density)
+
+qchisq: at what quantile would I have passed this amount of distribution?
+
+
+pchisq(chisquare you calculate, df)
+
+
+
+
+
+
+
+for loop
+
+
+```{r}
+myV <- c()
+for (i in 1:5) {
+  myV[i] <- i
+}
+myV
+```
+
+
+
+
+sample() takes in some object and it samples out
+```{r}
+#sample(myRandData, size = 100, replace = T)
+```
+
+
+```{r}
+myV <- c()
+for (i in 1:5) {
+#  tmp <- sample(myRandData, size = 100, replace = T)
+#  myV[i] <- median(tmp)
+}
+```
