@@ -1,0 +1,456 @@
+---
+title: "Week04 Assignment"
+author: "Sophie Kim"
+date: "March 1, 2016"
+output: html_document
+---
+--------------------------------------------------------------------------------------------------------------
+
+
+#1. The Problem of Distance
+
+Plot recombination fractions (for many values between 0 and 1) against mapping distance
+
+```{r}
+
+recfrac <- (0:50)/100
+cM <- recfrac * 100
+
+plot(x = cM, y = recfrac, xlab = "Mapping Distance", ylab = "Recombination Fractions", main = "Recombination Fractions Against Mapping Distance", type = "l")
+
+lines(x = cM, y = 0.5* (1 - 2.71828^(-2*recfrac)), type = "l", lty = 2)
+
+legend(x = "bottomright", legend = c("Morgan", "Haldane"), lty = c(1,2))
+
+```
+
+
+
+
+#2. Using Distance
+
+- The code blocks show a table of each gene triplet paired with corresponding frequencies.
+
+- Parental Genotypes were revealed by the genotypes with the greatest number of frequencies.
+
+- Double Recombinant Genotypes were revealed by the genotypes with the least number of frequencies.
+
+- Gene Triplet (allele1_allele1_allele1) is written as (1, 1, 1) for purposes of simplicity
+
+
+
+
+> GeneTriplet1
+
+```{r}
+
+gameteTable <- read.table("listOfGametes")
+
+table(subset(gameteTable, V2 == "GeneTriplet1")$V1)
+
+```
+Parental Genotype: (1, 1, 1), (2, 2, 2)
+
+Double Recombinants: (1, 2, 1), (2, 1, 2)
+
+1. Middle gene: Gene2 (given triplet of (gene1, gene2, gene3) in the data)
+
+--> Gene order: Gene1, Gene2, Gene3
+
+2. Morgan Mapping Distance Calculation
+```{r}
+
+mDist1_12 <- ((195 + 167 + 11 + 21) / 1000 ) * 100
+
+mDist1_23 <- ((26 + 34 + 11 + 21) / 1000 ) * 100
+
+mDist1_13 <- mDist1_12 + mDist1_23
+
+mDist1_12
+mDist1_23
+mDist1_13
+
+```
+- mDist1_12 represents the Morgan mapping distance between Gene1 and Gene2 in GeneTriplet1 Group
+
+- mDist1_23 represents the Morgan mapping distance between Gene2 and Gene3 in GeneTriplet1 Group
+
+- mDist1_13 represents the Morgan mapping distance between Gene1 and Gene3 in GeneTriplet1 Group
+
+
+3. Haldane Mapping Distance Calculation
+```{r}
+
+getHaldane <- function(rf) {
+  rfValue <- rf/100
+  m <- -log(1-2*rfValue)
+  mdHaldane <- 50*m
+  return(mdHaldane)
+}
+
+hDist1_12 <- getHaldane(mDist1_12)
+hDist1_13 <- getHaldane(mDist1_13)
+hDist1_23 <- getHaldane(mDist1_23)
+
+hDist1_12
+hDist1_13
+hDist1_23
+
+```
+- hDist1_12 represents the Haldane mapping distance between Gene1 and Gene2 in GeneTriplet1 Group
+
+- hDist1_23 represents the Haldane mapping distance between Gene2 and Gene3 in GeneTriplet1 Group
+
+- hDist1_13 represents the Haldane mapping distance between Gene1 and Gene3 in GeneTriplet1 Group
+
+
+
+> GeneTriplet2
+```{r}
+
+table(subset(gameteTable, V2 == "GeneTriplet2")$V1)
+
+```
+Parental Genotype: (1, 1, 1), (2, 2, 2)
+
+Double Recombinants: (1, 2, 1), (2, 1, 2)
+
+1. Middle gene: Gene2
+
+--> Gene order: Gene1, Gene2, Gene3
+
+2. Morgan Mapping Distance Calculation
+```{r}
+
+mDist2_12 <- ((3 + 4 +5 + 1) / 1000 ) * 100
+
+mDist2_23 <- ((245 + 233 + 5 + 1) / 1000 ) * 100
+
+mDist2_13 <- mDist2_12 + mDist2_23
+
+mDist2_12
+mDist2_23
+mDist2_13
+
+```
+- mDist2_12 represents the Morgan mapping distance between Gene1 and Gene2 in GeneTriplet2 Group
+
+- mDist2_23 represents the Morgan mapping distance between Gene2 and Gene3 in GeneTriplet2 Group
+
+- mDist2_13 represents the Morgan mapping distance between Gene1 and Gene3 in GeneTriplet2 Group
+
+3. Haldane Mapping Distance Calculation
+
+```{r}
+
+hDist2_12 <- getHaldane(mDist2_12)
+hDist2_13 <- getHaldane(mDist2_13)
+hDist2_23 <- getHaldane(mDist2_23)
+
+hDist2_12
+hDist2_13
+hDist2_23
+
+```
+- hDist2_12 represents the Haldane mapping distance between Gene1 and Gene2 in GeneTriplet2 Group
+
+- hDist2_23 represents the Haldane mapping distance between Gene2 and Gene3 in GeneTriplet2 Group
+
+- hDist2_13 represents the Haldane mapping distance between Gene1 and Gene3 in GeneTriplet2 Group
+
+
+> GeneTriplet3
+```{r}
+
+table(subset(gameteTable, V2 == "GeneTriplet2")$V1)
+
+```
+Parental Genotype: (1, 1, 1), (2, 2, 2)
+
+Double Recombinants: (1, 2, 1), (2, 1, 2)
+
+1. Middle gene: Gene2
+
+--> Gene order: Gene1, Gene2, Gene3
+
+2. Morgan Mapping Distance Calculation
+```{r}
+
+mDist3_12 <- ((81 + 89 + 19 + 20) / 1000 ) * 100
+
+mDist3_23 <- ((76 + 72 + 19 + 20) / 1000 ) * 100
+
+mDist3_13 <- mDist3_12 + mDist3_23
+
+mDist3_12
+mDist3_23
+mDist3_13
+
+```
+- mDist3_12 represents the Morgan mapping distance between Gene1 and Gene2 in GeneTriplet3 Group
+
+- mDist3_23 represents the Morgan mapping distance between Gene2 and Gene3 in GeneTriplet3 Group
+
+- mDist3_13 represents the Morgan mapping distance between Gene1 and Gene3 in GeneTriplet3 Group
+
+3. Haldane Mapping Distance Calculation
+
+```{r}
+
+hDist3_12 <- getHaldane(mDist3_12)
+hDist3_13 <- getHaldane(mDist3_13)
+hDist3_23 <- getHaldane(mDist3_23)
+
+hDist3_12
+hDist3_13
+hDist3_23
+
+```
+- hDist3_12 represents the Haldane mapping distance between Gene1 and Gene2 in GeneTriplet3 Group
+
+- hDist3_23 represents the Haldane mapping distance between Gene2 and Gene3 in GeneTriplet3 Group
+
+- hDist3_13 represents the Haldane mapping distance between Gene1 and Gene3 in GeneTriplet3 Group
+
+> GeneTriplet4
+```{r}
+
+table(subset(gameteTable, V2 == "GeneTriplet2")$V1)
+
+```
+Parental Genotype: (1, 1, 1), (2, 2, 2)
+
+Double Recombinants: (1, 1, 2), (2, 2, 1)
+
+1. Middle gene: Gene3
+
+--> Gene order: Gene1, Gene3, Gene2
+
+2. Morgan Mapping Distance Calculation
+```{r}
+
+mDist4_13 <- ((198 + 190 + 37 + 55) / 1000 ) * 100
+
+mDist4_23 <- ((60 + 62 + 37 + 55) / 1000 ) * 100
+
+mDist4_12 <- mDist4_13 + mDist4_23
+
+mDist4_12
+mDist4_23
+mDist4_13
+
+```
+- mDist4_12 represents the Morgan mapping distance between Gene1 and Gene2 in GeneTriplet4 Group
+
+- mDist4_23 represents the Morgan mapping distance between Gene2 and Gene3 in GeneTriplet4 Group
+
+- mDist4_13 represents the Morgan mapping distance between Gene1 and Gene3 in GeneTriplet4 Group
+
+
+3. Haldane Mapping Distance Calculation
+```{r}
+
+hDist4_12 <- getHaldane(mDist4_12)
+hDist4_13 <- getHaldane(mDist4_13)
+hDist4_23 <- getHaldane(mDist4_23)
+
+hDist4_12
+hDist4_13
+hDist4_23
+
+```
+- hDist4_12 represents the Haldane mapping distance between Gene1 and Gene2 in GeneTriplet4 Group
+
+- hDist4_23 represents the Haldane mapping distance between Gene2 and Gene3 in GeneTriplet4 Group
+
+- hDist4_13 represents the Haldane mapping distance between Gene1 and Gene3 in GeneTriplet4 Group
+
+
+
+
+#3. A More Complex Map
+
+>> Part 1. Calculate the distance between genes for each set of three genes (ie for each individual)
+
+- Read data from text file into variable cMap
+```{r}
+
+cMap <- read.table("gamete_genotyping_project.txt", header = T)
+
+```
+
+
+> Individual 1
+
+```{r}
+
+data1 <- subset(cMap, individual_id == 1)
+
+sum1 <- sum(data1$gamete_count)
+
+```
+( sum1 stores the total number of gametes for individual1. )
+
+- Parental Genotype: sng/+++
+- Double Recombinant Genotype: s+g/+n+
+- Middle gene: n
+- Gene order: s, n, g
+
+```{r}
+s_n <- (20 + 1 + 30 + 2) / sum1
+n_g <- (7 + 1 + 10 + 2) / sum1
+
+s_n 
+n_g
+
+
+```
+
+
+
+> Individual 2
+
+- visualization of individual2 data
+```{r}
+
+data2 <- subset(cMap, individual_id == 2)
+
+sum2 <- sum(data2$gamete_count)
+
+```
+( sum2 stores the total number of gametes for individual2. )
+
+- Parental Genotype: n+g/+j+
+- Double Recombinant Genotype: +++/njg
+- Middle gene: j
+- Gene order: n, j, g
+
+```{r}
+n_j <- (4 + 0 + 5 + 1) / sum2
+j_g <- (2 + 1 + 1 + 0) / sum2
+
+n_j
+j_g
+```
+
+
+
+> Individual 3
+
+```{r}
+
+data3 <- subset(cMap, individual_id == 3)
+
+sum3 <- sum(data3$gamete_count)
+
+```
+( sum3 stores the total number of gametes for individual3. )
+
+- Parental Genotype: ne+/++i
+- Double Recombinant Genotype: n++/+ei
+- Middle gene: e
+- Gene order: n, e, i
+
+```{r}
+n_e <- (6 + 1 + 8 + 0) / sum3
+e_i <- (3 + 1 + 4 + 0) / sum3
+
+n_e
+e_i
+```
+
+> Individual 4
+
+```{r}
+
+data4 <- subset(cMap, individual_id == 4)
+
+sum4 <- sum(data4$gamete_count)
+
+```
+( sum4 stores the total number of gametes for individual4. )
+
+- Parental Genotype: s++/+ci
+- Double Recombinant Genotype: ++i/sc+
+- Middle gene: c
+- Gene order: s, c, i
+
+```{r}
+s_c <- (6 + 0 + 5 + 1) / sum4
+c_i <- (2 + 0 + 3 + 1) / sum4
+
+s_c
+c_i
+```
+
+
+> Individual 5
+
+```{r}
+
+data5 <- subset(cMap, individual_id == 5)
+
+sum5 <- sum(data5$gamete_count)
+
+```
+( sum5 stores the total number of gametes for individual5. )
+
+- Parental Genotype: sej/+++
+- Double Recombinant Genotype: s+j/+e+
+- Middle gene: e
+- Gene order: s, e, j
+
+```{r}
+s_e <- (18 + 4 + 20 + 5) / sum5
+e_j <- (25 + 4 + 28 + 5) / sum5
+
+s_e
+e_j
+```
+
+>> Part 2. Make a genetic map composed of all seven traits
+
+
+
+Gathering information from the data above:
+
+s _ _ _ n _ g
+
+_ _ _ _ n j g
+
+_ _ i e n _ _
+
+s c i _ _ _ _
+
+s _ _ e _ j _
+
+So the complete sequence is : s-c-i-e-n-j-g
+
+
+
+```{r}
+
+plot(x = c(0,0.5), y = c(1,1), xlab = "Mapping Distance (cM)", ylab = '', main = "Genetic Map of 7 Traits", type = "l")
+text(x = 0.00, y = 1.1, labels = "s")
+text(x = 0.06, y = 1.1, labels = "c")
+text(x = 0.09, y = 1.1, labels = "i")
+text(x = 0.16, y = 1.1, labels = "e")
+text(x = 0.29, y = 1.1, labels = "n")
+text(x = 0.37, y = 1.1, labels = "j")
+text(x = 0.41, y = 1.1, labels = "g")
+
+text(x = 0.00, y = 1.0, labels = "|")
+text(x = 0.06, y = 1.0, labels = "|")
+text(x = 0.09, y = 1.0, labels = "|")
+text(x = 0.16, y = 1.0, labels = "|")
+text(x = 0.29, y = 1.0, labels = "|")
+text(x = 0.37, y = 1.0, labels = "|")
+text(x = 0.41, y = 1.0, labels = "|")
+
+text(x = 0.03, y = 0.95, labels = "0.060")
+text(x = 0.075, y = 0.95, labels = "0.030")
+text(x = 0.125, y = 0.95, labels = "0.070")
+text(x = 0.225, y = 0.95, labels = "0.132")
+text(x = 0.333, y = 0.95, labels = "0.081")
+text(x = 0.392, y = 0.95, labels = "0.033")
+```

@@ -1,0 +1,77 @@
+---
+title: "Week04 Recitation"
+author: "Sophie Kim"
+date: "February 24, 2016"
+output: html_document
+---
+
+
+
+```{r}
+
+#floor(funif(n=100, min=1, max=7))
+
+#floor(funif(n=3, min=1, max=7))
+
+
+
+
+z <- (0:100)/100
+
+2^z
+
+plot(x = z, y = 2^z, type = "l")
+
+plot(x = z, y = 3^z, type = "l")
+
+lines(x = z, y = 3^z, type = "l") 
+
+lines(x = z, y = 4^z, type = "l", lty = 2)
+
+legend(x = "bottomright", legend = c("function won", "function too"), lty = c(1,2))
+
+
+listG <- read.table("listOfGametes")
+
+str(listG)
+
+head(listG)
+tail(listG)
+
+listG$V2 == "GeneTriplet3"
+
+listG[listG$V == "GeneTriplet3"]
+
+subset(listG, V2 == "GeneTriplet3")
+
+subset(listG, V2 == "GeneTriplet3")$V1
+
+table(subset(listG, V2 == "GeneTriplet3")$V1)
+```
+
+* you generate a new plot initially, and add lines to it
+subset(dataframe, condition)
+
+```{r}
+
+
+ggp <- read.table("gamete_genotyping_project.txt", header = T)
+
+subset(ggp, individual_id == 3)
+```
+5 individuals
+directly genotyped the gametes
+
+
+2 different states, 3 different loci --> 2^3 different gametes
+
+```{r}
+plot(x = c(0,1), y = c(1,1), type = "l")
+text(x = 0.2, y = 1.1, labels = "A")
+text(x = 0.5, y = 1.1, labels = "B")
+text(x = 0.8, y = 1.1, labels = "C")
+```
+
+*cannot undo plot, so must regenerate
+
+*can be done using vector of labels, not three separate text functions
