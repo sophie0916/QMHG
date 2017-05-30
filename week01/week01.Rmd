@@ -1,0 +1,128 @@
+---
+title: "Week01 Recitation"
+author: "Sophie Kim"
+date: "January 28th, 2016"
+output: html_document
+---
+
+
+x M- rnorm(100): generates random numbers from the normal distribution
+
+mean(x): mean function
+
+median(x)
+
+var(x)
+
+table(x): how many times each data occurs in a dataset
+
+sort(table(x), decreasing = T): sorts the frequency (used as mode function --> not mode(x))
+
+
+#Three elements of a function:
+1. function
+2. argument
+3. code block
+
+
+```{r}
+
+a <- function (zerp) {
+  return (zerp)
+}
+
+
+
+
+```
+
+
+prod(x): computes the product of all the elements in vector x
+
+length(x): returns the length of the vector/list
+
+Geometric mean: take nth sqrt of product of n data
+
+--> nice way of getting estimates for skewed data
+
+```{r}
+
+gMean <- function(x) {
+  result <- prod(x) ^ 1/(length(x))
+  return(result)
+}
+
+```
+
+Functions with multiple arguments
+```{r}
+
+gMean1 <- function(x, y) {
+  return (x + y)
+}
+
+```
+
+
+Functions with default values
+```{r}
+
+gMean2 <- function(x, y = 0) {
+  return (x + y)
+}
+```
+
+
+
+
+-----------------------------------------------------------------------------------------------
+
+#Exercise
+
+
+```{r}
+
+anz <- read.csv("anscombes.csv")
+
+is(anz)
+
+anz[3]
+
+anz[3,]
+
+anz[3:8,]
+
+anz[1:11,]
+
+anz[anz$dataset == 1, ]
+
+anz[anz$dataset == 1, ]$x
+
+anz[anz$dataset == 1, "x"]
+
+anz[anz$dataset == 1, 1]
+
+mean(anz[anz$dataset == 1, 1])
+
+
+mean(anz[anz$dataset == 1, "x"])
+
+var(anz[anz$dataset == 1, "x"])
+
+mean(anz[anz$dataset == 1, "y"])
+
+var(anz[anz$dataset == 1, "y"])
+
+
+hist( rnorm(1000))
+
+boxplot( rnorm(1000))
+
+abline(v = 1)
+
+abline(v = 1.5)
+
+abline(v = 2, col = "red")
+```
+
+*create a plot first (plot has to be currently active) then use the abline function

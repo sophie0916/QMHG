@@ -1,0 +1,99 @@
+---
+title: "Week01 Assignment"
+author: "Sophie Kim"
+date: "February 8th, 2016"
+output: html_document
+---
+
+#1. Reading the Datar
+
+* Store the data in "birthdata.csv" file as the newly initialized variable "birthData"
+```{r}
+birthData <- read.csv("birthdata.csv")
+```
+
+* Identify what type of variable "birthData"" is
+```{r}
+is(birthData)
+```
+
+* Print first part of birthData
+```{r}
+head(birthData)
+```
+
+
+#2. Using and Writing Functions
+
+* Calculate mean of birthweights
+```{r}
+mean(birthData[,"grams"])
+```
+
+* Calculate median of birthweights
+```{r}
+median(birthData[,"grams"])
+```
+
+* Identify range of birthweights
+```{r}
+range(birthData[,"grams"])
+```
+
+* Calculate standard deviation of birthweights
+```{r}
+sd(birthData[,"grams"])
+```
+
+* Defining the function getSE
+
+Function name: getSE
+
+Argument: variable that stores the data 
+
+Code block: calculates Standard Error by using var(), length() functions for variance and sample size
+```{r}
+getSE <- function(birthData) {
+  SD <- sd(birthData$"grams")
+  size <- length(birthData$"grams")
+  SE <- SD / sqrt(size)
+  return(SE)
+}
+```
+
+Call on function getSE to calculate Standard Error of birthweights in the birthData variable
+```{r}
+getSE(birthData)
+
+```
+
+
+
+#3. Graphical Analysis
+
+Representation of birthweight data in graphical forms:
+
+1. Histogram
+```{r}
+
+hist(birthData$grams, breaks = 100, main = "Histogram of BirthWeight", xlim = c(0,6000), xlab = "BirthWeight (g)", ylab = "Frequency")
+
+abline(v = mean(birthData$grams), col = "red")
+
+abline(v = median(birthData$grams), col = "yellow")
+
+
+```
+
+*The red line indicates the mean of birthweights
+
+*The yellow line indicates the median of birthweights
+
+
+2. Box plot
+```{r}
+boxplot(birthData$grams)
+
+```
+
+Comment: I prefer the histogram to the boxplot, because it is easier to visualize both mean and the median, as well as the overll distribution of the data. The histogram resembles a bell shaped curve, in which the birthweights of newborns are most frequent near the mean and the median around 3300g. The box plot, on the other hand, shows the first, second(median), and the third quartiles, therefore giving an approximation of where middle values exist, as well as allowing visualization of the min/max values and some outliers.
