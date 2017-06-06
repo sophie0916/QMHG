@@ -1,0 +1,665 @@
+---
+title: "Week07 Assignment"
+author: "Sophie Kim"
+date: "April 5, 2016"
+output: html_document
+---
+----------------------------------------------------------------------------------------------------
+
+# 1 Building a simulation of drift
+
+> Workup
+
+1.1 First four steps
+
+```{r}
+N <- 10
+tN <- 2*N
+probV <- 0.5
+probV[2] <- rbinom(n = 1, size = tN, probV)/tN
+probV[3] <- rbinom(n = 1, size = tN, probV[2])/tN
+probV[4] <- rbinom(n = 1, size = tN, probV[3])/tN
+
+```
+
+
+
+1.2 Next n steps
+
+```{r}
+
+N <- 10
+tN <- 2*N
+freqV <- 0.5
+for (i in 2:100) {
+  freqV[i] <- rbinom(n = 1, size = tN, prob = freqV[i-1])/tN
+}
+plot(freqV, type = "l", ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency")
+
+```
+
+
+
+1.3 Multiple simulations
+
+```{r}
+
+N <- 10
+tN <- N*2
+
+results <- list()
+
+for (i in 1:9) {
+  freqV <- 0.5
+  for (j in 2:100) {
+    freqV[j] <- rbinom(n = 1, size = tN, prob = freqV[j-1])/tN
+  }
+  results[[i]] <- freqV
+}
+
+plot(results[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+
+
+```
+
+> Simulation based on different Population Size and Initial Alele Frequency
+
+1.5 Using the Drifter to study drift
+
+1) Population Size (N) = 10, Initial Allele Frequency = 0.5
+```{r}
+
+N1 <- 10
+tN1 <- N1*2
+
+results1 <- list()
+
+for (i in 1:9) {
+  freqV1 <- 0.5
+  for (j in 2:200) {
+    freqV1[j] <- rbinom(n = 1, size = tN1, prob = freqV1[j-1])/tN1
+  }
+  results1[[i]] <- freqV1
+}
+
+plot(results1[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results1[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+
+
+2) Population Size (N) = 10, Initial Allele Frequency = 0.1
+```{r}
+
+N2 <- 10
+tN2 <- N2*2
+
+results2 <- list()
+
+for (i in 1:9) {
+  freqV2 <- 0.1
+  for (j in 2:200) {
+    freqV2[j] <- rbinom(n = 1, size = tN2, prob = freqV2[j-1])/tN2
+  }
+  results2[[i]] <- freqV2
+}
+
+plot(results2[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results2[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+3) Population Size (N) = 10, Initial Allele Frequency = 1/2N
+```{r}
+
+N3 <- 10
+tN3 <- N3*2
+
+results3 <- list()
+
+for (i in 1:9) {
+  freqV3 <- 1/tN3
+  for (j in 2:200) {
+    freqV3[j] <- rbinom(n = 1, size = tN3, prob = freqV3[j-1])/tN3
+  }
+  results3[[i]] <- freqV3
+}
+
+plot(results3[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results3[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+
+4) Population Size (N) = 100, Initial Allele Frequency = 0.5
+```{r}
+
+N4 <- 100
+tN4 <- N4*2
+
+results4 <- list()
+
+for (i in 1:9) {
+  freqV4 <- 0.5
+  for (j in 2:200) {
+    freqV4[j] <- rbinom(n = 1, size = tN4, prob = freqV4[j-1])/tN4
+  }
+  results4[[i]] <- freqV4
+}
+
+plot(results4[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results4[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+5) Population Size (N) = 100, Initial Allele Frequency = 0.1
+```{r}
+
+N5 <- 100
+tN5 <- N5*2
+
+results5 <- list()
+
+for (i in 1:9) {
+  freqV5 <- 0.1
+  for (j in 2:200) {
+    freqV5[j] <- rbinom(n = 1, size = tN5, prob = freqV5[j-1])/tN5
+  }
+  results5[[i]] <- freqV5
+}
+
+plot(results5[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results5[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+6) Population Size (N) = 100, Initial Allele Frequency = 1/2N
+```{r}
+
+N6 <- 100
+tN6 <- N6*2
+
+results6 <- list()
+
+for (i in 1:9) {
+  freqV6 <- 1/tN6
+  for (j in 2:200) {
+    freqV6[j] <- rbinom(n = 1, size = tN6, prob = freqV6[j-1])/tN6
+  }
+  results6[[i]] <- freqV6
+}
+
+plot(results6[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results6[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+7) Population Size (N) = 1000, Initial Allele Frequency = 0.5
+```{r}
+
+N7 <- 1000
+tN7 <- N7*2
+
+results7 <- list()
+
+for (i in 1:9) {
+  freqV7 <- 0.5
+  for (j in 2:200) {
+    freqV7[j] <- rbinom(n = 1, size = tN7, prob = freqV7[j-1])/tN7
+  }
+  results7[[i]] <- freqV7
+}
+
+plot(results7[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results7[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+8) Population Size (N) = 1000, Initial Allele Frequency = 0.1
+```{r}
+
+N8 <- 1000
+tN8 <- N8*2
+
+results8 <- list()
+
+for (i in 1:9) {
+  freqV8 <- 0.1
+  for (j in 2:200) {
+    freqV8[j] <- rbinom(n = 1, size = tN8, prob = freqV8[j-1])/tN8
+  }
+  results8[[i]] <- freqV8
+}
+
+plot(results8[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results8[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+9) Population Size (N) = 1000, Initial Allele Frequency = 1/2N
+```{r}
+
+N9 <- 1000
+tN9 <- N9*2
+
+results9 <- list()
+
+for (i in 1:9) {
+  freqV9 <- 1/tN9
+  for (j in 2:200) {
+    freqV9[j] <- rbinom(n = 1, size = tN9, prob = freqV9[j-1])/tN9
+  }
+  results9[[i]] <- freqV9
+}
+
+plot(results9[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results9[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+Comments on the Simulations with varying population size and initial allele frequency:
+
+- Population Size: As population size increases, variance of allele frequencies decreases significantly - this is visualized by graphs converging to be horizontally narrower (but not necessarily towards zero allele frequency) as the population size increases from 10 to 1000. Since the frequency of the allele of interest converges to a certain fraction, it can be concluded that as population size increases, allele fixation becomes harder.
+
+- Initial Allele Frequency: As initial allele frequency decreases, the allele frequencies of subsequent generations approach zero allele frequency more rapidly, suggesting allele fixation.
+
+
+
+
+
+#2 Selection
+
+
+Function to calculate the allele frequency of the next generation according to fitness
+```{r}
+
+getfreq <- function(freqA) {
+  freqq <- c()
+  freqq[1] <- freqA
+  freqq[2] <- 2 * freqA * (1 - freqA)
+  freqq[3] <- 1 - freqA
+  return(freqq)
+}
+
+probA <- function(fitness, freq, N) {
+  totalContributedA <- (2 * freq[1] * fitness[1] * N) + (1 * freq[2] * fitness[2] * N)
+  totalContributedB <- (2 * freq[3] * fitness[3] * N) + (1 * freq[2] * fitness[2] * N)
+  frequencyContributed <- totalContributedA / (totalContributedA + totalContributedB)
+  return(frequencyContributed)
+}
+```
+
+
+
+> Scenario C: 
+
+
+- Initial Frequency of Allele A = 0.9
+
+- AA Fitness: 0.5
+
+- AB Fitness: 0.5
+
+- BB Fitness: 1
+
+1) n = 10
+
+```{r}
+
+fit <- c(0.5, 0.5, 1)
+
+N <- 10
+tN <- N*2
+
+results <- list()
+
+for (i in 1:9) {
+  
+  tempfreq <- getfreq(0.9)
+  freqV <- tempfreq[1]
+  
+  for (j in 2:200) {
+    freqV[j-1] <- tempfreq[1]
+    freqV[j] <- rbinom(n = 1, size = tN, prob = probA(fit, getfreq(freqV[j-1]), N))/tN
+    tempfreq <- getfreq(freqV[j])
+    
+  }
+  results[[i]] <- freqV
+}
+
+plot(results[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+
+2) n = 100
+
+```{r}
+
+fit <- c(0.5, 0.5, 1)
+
+N <- 100
+tN <- N*2
+
+results <- list()
+
+for (i in 1:9) {
+  
+  tempfreq <- getfreq(0.9)
+  freqV <- tempfreq[1]
+  
+  for (j in 2:200) {
+    freqV[j-1] <- tempfreq[1]
+    freqV[j] <- rbinom(n = 1, size = tN, prob = probA(fit, getfreq(freqV[j-1]), N))/tN
+    tempfreq <- getfreq(freqV[j])
+    
+  }
+  results[[i]] <- freqV
+}
+
+plot(results[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+
+3) n = 1000
+
+```{r}
+
+fit <- c(0.5, 0.5, 1)
+
+N <- 1000
+tN <- N*2
+
+results <- list()
+
+for (i in 1:9) {
+  
+  tempfreq <- getfreq(0.9)
+  freqV <- tempfreq[1]
+  
+  for (j in 2:200) {
+    freqV[j-1] <- tempfreq[1]
+    freqV[j] <- rbinom(n = 1, size = tN, prob = probA(fit, getfreq(freqV[j-1]), N))/tN
+    tempfreq <- getfreq(freqV[j])
+    
+  }
+  results[[i]] <- freqV
+}
+
+plot(results[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+
+< Comments on Scenario C > 
+
+- With smaller population size, variance among allele frequencies is still visible at earlier generations. 
+
+- As population size increases, variance seems to increase in later generations and the allele persists in some of the simulations, though in all simulations the allele frequencies eventually approazh zero. 
+
+- However, regardless of population size, allele fixation is predicted to occur (with the B allele remaining), where the allele frequency of A seems to approach zero as the number of generations gets closer to 200. This scenario is likely demonstrating positive selection in which natural selection favors one allele(B) over the other(A).
+
+> Scenario D: 
+
+- Initial Frequency of Allele A = 0.1
+
+- AA Fitness: 1
+
+- AB Fitness: 0.25
+
+- BB Fitness: 0.5
+
+1) n = 10
+
+```{r}
+
+fit <- c(1, 0.25, 0.5)
+
+N <- 10
+tN <- N*2
+
+results <- list()
+
+for (i in 1:9) {
+  
+  tempfreq <- getfreq(0.1)
+  freqV <- tempfreq[1]
+  
+  for (j in 2:200) {
+    freqV[j-1] <- tempfreq[1]
+    freqV[j] <- rbinom(n = 1, size = tN, prob = probA(fit, getfreq(freqV[j-1]), N))/tN
+    tempfreq <- getfreq(freqV[j])
+    
+  }
+  results[[i]] <- freqV
+}
+
+plot(results[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+
+2) n = 100
+
+```{r}
+
+fit <- c(1, 0.25, 0.5)
+
+N <- 100
+tN <- N*2
+
+results <- list()
+
+for (i in 1:9) {
+  
+  tempfreq <- getfreq(0.1)
+  freqV <- tempfreq[1]
+  
+  for (j in 2:200) {
+    freqV[j-1] <- tempfreq[1]
+    freqV[j] <- rbinom(n = 1, size = tN, prob = probA(fit, getfreq(freqV[j-1]), N))/tN
+    tempfreq <- getfreq(freqV[j])
+    
+  }
+  results[[i]] <- freqV
+}
+
+plot(results[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+
+3) n = 1000
+
+```{r}
+
+fit <- c(1, 0.25, 0.5)
+
+N <- 1000
+tN <- N*2
+
+results <- list()
+
+for (i in 1:9) {
+  
+  tempfreq <- getfreq(0.1)
+  freqV <- tempfreq[1]
+  
+  for (j in 2:200) {
+    freqV[j-1] <- tempfreq[1]
+    freqV[j] <- rbinom(n = 1, size = tN, prob = probA(fit, getfreq(freqV[j-1]), N))/tN
+    tempfreq <- getfreq(freqV[j])
+    
+  }
+  results[[i]] <- freqV
+}
+
+plot(results[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+< Comments on Scenario D > 
+
+- With smaller population size, variance among allele frequencies is still visible, and greater in magnitude than that of the simulations with larger populations, at earlier generations. 
+
+- As population size increases, variance that exists in the earlier generations seems to decrease in magnitude (so allele fixation is predicted to occur more rapidly).
+
+- Regardless of population size, allele fixation is predicted to occur (with the A allele remaining), where the allele frequency of A seems to approach one as the number of generations gets closer to 200 (but very rapidly - in most cases before the 50th generation). This scenario is likely demonstrating positive selection in which natural selection favors one allele(A) over the other(B).
+
+> Scenario E: 
+
+- Initial Frequency of Allele A = 0.1
+
+- AA Fitness: 0.5
+
+- AB Fitness: 1
+
+- BB Fitness: 0.5
+
+1) n = 10
+
+```{r}
+
+fit <- c(0.5, 1, 0.5)
+
+N <- 10
+tN <- N*2
+
+results <- list()
+
+for (i in 1:9) {
+  
+  tempfreq <- getfreq(0.1)
+  freqV <- tempfreq[1]
+  
+  for (j in 2:200) {
+    freqV[j-1] <- tempfreq[1]
+    freqV[j] <- rbinom(n = 1, size = tN, prob = probA(fit, getfreq(freqV[j-1]), N))/tN
+    tempfreq <- getfreq(freqV[j])
+    
+  }
+  results[[i]] <- freqV
+}
+
+plot(results[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+
+2) n = 100
+
+```{r}
+
+fit <- c(0.5, 1, 0.5)
+
+N <- 100
+tN <- N*2
+
+results <- list()
+
+for (i in 1:9) {
+  
+  tempfreq <- getfreq(0.1)
+  freqV <- tempfreq[1]
+  
+  for (j in 2:200) {
+    freqV[j-1] <- tempfreq[1]
+    freqV[j] <- rbinom(n = 1, size = tN, prob = probA(fit, getfreq(freqV[j-1]), N))/tN
+    tempfreq <- getfreq(freqV[j])
+    
+  }
+  results[[i]] <- freqV
+}
+
+plot(results[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+
+3) n = 1000
+
+```{r}
+
+fit <- c(0.5, 1, 0.5)
+
+N <- 1000
+tN <- N*2
+
+results <- list()
+
+for (i in 1:9) {
+  
+  tempfreq <- getfreq(0.1)
+  freqV <- tempfreq[1]
+  
+  for (j in 2:200) {
+    freqV[j-1] <- tempfreq[1]
+    freqV[j] <- rbinom(n = 1, size = tN, prob = probA(fit, getfreq(freqV[j-1]), N))/tN
+    tempfreq <- getfreq(freqV[j])
+    
+  }
+  results[[i]] <- freqV
+}
+
+plot(results[[1]], type = "l", col = 1, ylim = c(0,1), xlab = "Generation", ylab = "Allele Frequency of A")
+for (line in 2:9) {
+  lines(results[[line]], type = "l", col = line, ylim = c(0,1))
+}
+
+```
+
+< Comments on Scenario E > 
+
+- With smaller population size, variance among allele frequencies is significantly greater in magnitude, in comparison to simulations with larger population sizes. 
+
+- As population size increases, variance that exists in the earlier generations seems to decrease in magnitude (so allele fixation is predicted to occur more rapidly).
+
+- However, regardless of population size, it is predicted that allele fixation is unlikely to occur, as the allele frequency in almost every simulation approaches 0.5. It is possible that this scenario could demonstrate heterozygote advantage (or balanced polymorphism), in which natural selection favors maintaining of both alleles.
