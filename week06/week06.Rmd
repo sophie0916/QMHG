@@ -1,0 +1,64 @@
+---
+title: "Week06 Recitation"
+author: "Sophie Kim"
+date: "March 23, 2016"
+output: html_document
+---
+
+---------------------------------------------------------------------------------
+
+
+
+
+F0 = 1/2N = 1/(2 individuals) = 1*1/(4 alleles) 
+
+F1 = 1/2N + (1- 1/2N)F0
+
+(if you pick either one of the two alleles, it's already inbred)
+
+(chance of picking any other allele and that that is the alleles of the ancestor)
+
+
+F2 = 1/2N + (1-1/2N)*F1
+
+   = 1/2N + (1-1/2N)*(1/2N + (1-1/2N)*1/2N) ???> do the longer way (since it is simulation)
+     
+     
+```{r}
+ef <- 1/4
+
+N <- 2
+
+1/(2*N) + (1-1/(2*N))*ef[1]
+ef[2] <- 1/(2*N) + (1-1/(2*N))*ef[1]
+ef[3] <- 1/(2*N) + (1-1/(2*N))*ef[2]
+ef[4] <- 1/(2*N) + (1-1/(2*N))*ef[3]
+
+```
+.
+.
+.
+
+to repetitively do this, use a forloop:
+
+
+```{r}
+N <- 2
+tN <- 2*N
+eff <- 1/tN
+
+ef[2] <- 1/tN + (1-1/tN)*ef[1]
+
+for (i in 1:200) {
+  ef[i+1] <- 1/tN + (1-1/tN)*ef[i]
+}
+
+ef
+
+```
+approaches 1 after some iterations
+
+
+```{r}
+plot(1:201, ef, type = "l")
+```

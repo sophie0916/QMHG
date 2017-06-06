@@ -1,0 +1,209 @@
+---
+title: "Week06 Assignment"
+author: "Sophie Kim"
+date: "March 28, 2016"
+output: html_document
+---
+
+---------------------------------------------------------------------
+
+#1. A Hardy Equilibrium?
+
+Test if the following populations are in Hardy-Weinberg equilibrium, or if you need to reject that null hypothesis (at a pvalue threshold of 0.05). I recommend a chi-square test, where you test if the observed frequencies differ from your expectation. Do consider how many degrees of freedom you have after you parameterize your null model of expected frequencies under a Hardy-Weinberg model.
+
+Test if these genotypes are in Hardy-Weinberge equilibrium: observed number of SNP rs9272426 genotypes in HLA-DQA1 of the MHC locus determined for people living in Tuscany, Italy: A/A - 17 A/G - 55 G/G - 12
+
+Null hypothesis: There is no relationship between A and G.
+
+```{r}
+
+n <- 17 + 55 + 12
+
+AA <- 17/n
+AG <- 55/n
+GG <- 12/n
+
+p <- AA + 0.5*AG
+q <- GG + 0.5*AG
+
+HWE <- p^2 + 2*p*q + q^2
+HWE
+
+p
+q
+
+```
+- Since p^2 + 2pq + q^2 = 1, the genotypes are in Hardy Weinberg equilibrium.
+
+
+Chi-square test
+```{r}
+obs1 <- c(17, 55, 12)/n
+exp1 <- c(0.2809, 0.4982, 0.2209)*n
+chi1 <- c()
+
+for(i in 1:3){
+  chi1[i] <- ((obs1[i] - exp1[i])^2) / (exp1[i])
+}
+
+sum1 <- sum(chi1)
+
+1-pchisq(sum1, df = 1) 
+
+```
+
+Since pvalue < 0.05, reject the null hypothesis.
+
+Therefore, there exists a relationship between A and G
+
+
+
+
+Test if these genotypes are in Hardy-Weinberge equilibrium: observed numbers of SNP rs334 genotypes of the Hb (hemoglobin B) gene sampled in the Yoruba of Nigeria: A/A - 44 A/T - 13 T/T - 1
+
+```{r}
+
+n <- 44 + 13 + 1
+
+AA <- 17/n
+AT <- 55/n
+TT <- 12/n
+
+p <- AA + 0.5*AT
+q <- TT + 0.5*AT
+
+HWE <- p^2 + 2*p*q + q^2
+HWE
+
+p
+q
+
+```
+
+- Since p^2 + 2pq + q^2 != 1, the genotypes are not in Hardy Weinberg equilibrium.
+
+
+
+```{r}
+
+obs2 <- c(44,13,0)
+exp2 <- c(44.74,11.51,0.74)
+chi2 <- c()
+for(i in 1:3) {
+  chi2[i] <- ((obs2[i] - exp2[i])^2) / (exp2[i])
+}
+
+sum2 <- sum(chi2)
+
+1-pchisq(sum2, df = 1)
+```
+
+Since pvalue > 0.05, we fail to reject the null
+
+Therefore, there is no relationship between A and T
+
+#2. Drift - Royal Style
+
+Plot a pedigree illustrating inbreeding. 
+
+```{r}
+
+pedDF <- data.frame(
+  id = c("Levi", "Leona", "Rosalynne", "Ben", "Jacklyn", "Matt", "Amy", "Austin", "Floyd"),
+  dadid = c(NA, NA, "Levi", "Levi", "Ben", "Ben", "Matt", "Matt", "Austin"),
+  momid = c(NA, NA, "Leona", "Leona", "Rosalynne", "Rosalynne", "Jacklyn", "Jacklyn", "Amy"), 
+  sex = c("male", "female", "female", "male", "female", "male", "female", "male", "male")
+)
+
+
+pedigreeObject <- with(pedDF, pedigree(id,dadid,momid,sex))
+
+plot(pedigreeObject)
+
+```
+
+Include one child in the final generation and calculate the appropriate inbreeding coefficient.
+
+
+Inbreeding coefficient for Floyd: 
+
+F_f <- (1/2)^3*(1+F_m) + (1/2)^3*(1+F_j)
+
+Inbreeding coefficient for Matt: 
+
+F_m <- (1/2)^3*(1+F_lv) + (1/2)^3*(1+F_ln)
+
+Inbreeding coefficient for Jacklynn: 
+
+F_j <- (1/2)^3*(1+F_lv) + (1/2)^3*(1+F_ln)
+
+Inbreeding coefficient for Levi: 
+
+F_lv <- 0
+
+Inbreeding coefficient for Leona: 
+
+F_ln <- 0
+
+
+```{r}
+
+F_ln <- 0
+F_lv <- 0
+F_j <- (1/2)^3*(1+F_lv) + (1/2)^3*(1+F_ln)
+F_m <- (1/2)^3*(1+F_lv) + (1/2)^3*(1+F_ln)
+F_f <- (1/2)^3*(1+F_m) + (1/2)^3*(1+F_j)
+
+F_f
+
+```
+
+Therefore, the inbreeding coefficient of the child in the final generation is 5/16 (= 0.3125)
+
+#3. Introducing simulation
+
+Simulate the dynamics of the increase in inbreeding coefficients in finite populations.
+
+On the same graph, plot this Fi (inbreeding coefficient) for 4 populations (N= 10, 50, 100, 500) over 200 generations using different colors or line types. Include a legend.
+
+
+```{r}
+
+N1 <- 10
+tN <- 2*N1
+ef1 <- 1/tN
+for (i in 1:200) {
+  ef1[i+1] <- 1/tN + (1-1/tN)*ef1[i]
+}
+
+N2 <- 50
+tN <- 2*N2
+ef2 <- 1/tN
+for (i in 1:200) {
+  ef2[i+1] <- 1/tN + (1-1/tN)*ef2[i]
+}
+
+N3 <- 100
+tN <- 2*N3
+ef3 <- 1/tN
+for (i in 1:200) {
+  ef3[i+1] <- 1/tN + (1-1/tN)*ef3[i]
+}
+
+N4 <- 500
+tN <- 2*N4
+ef4 <- 1/tN
+for (i in 1:200) {
+  ef4[i+1] <- 1/tN + (1-1/tN)*ef4[i]
+}
+
+ef1
+
+plot(1:201, ef1, type = "l", col="red")
+points(1:201, ef2, type = "l", col="yellow")
+points(1:201, ef3, type = "l", col="green")
+points(1:201, ef4, type = "l", col="blue")
+
+legend("topright", c("N = 10","N = 50", "N = 100", "N = 500"), pch = c(20, 20, 20, 20), col = c("red", "yellow", "green", "blue"))
+
+```
