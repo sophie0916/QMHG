@@ -1,0 +1,8 @@
+Haploptype	SNP1	SNP2	SNP3	C/T-13910	SNP4	SNP5	SNP6	N
+A	A	A	G	T	A	T	T	41
+B	G	A	G	T	A	T	A	23
+C	A	T	G	T	A	A	A	9
+D	A	T	A	C	G	A	T	12
+E	G	G	A	C	G	T	T	8
+F	A	A	C	C	T	T	T	8
+G	T	C	T	C	T	C	G	5

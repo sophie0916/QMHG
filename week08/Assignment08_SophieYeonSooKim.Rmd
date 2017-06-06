@@ -1,0 +1,288 @@
+---
+title: "Week08 Assignment"
+author: "Sophie Kim"
+date: "April 13, 2016"
+output: html_document
+---
+------------------------------------------------------------------------------------------------------------
+
+#1. Thee Normals
+
+```{r}
+
+rdist <- rchisq(5000, 50)
+
+hist(rdist, main = "Histogram of 5000 random data values", xlab = "Random Values")
+
+```
+
+1.1 Zee scores
+
+```{r}
+
+zee <- c()
+
+for (i in 1:5000) {
+  zee[i] <- (rdist[i]-mean(rdist))/sd(rdist)
+}
+
+hist(zee, main = "Histogram of Z-scores of the 5000 data values", xlab = "Z-scores")
+
+```
+
+1.2 Shapiro will know
+
+```{r}
+
+shapiro.test(rdist)
+
+```
+
+- The shapiro test tests for whether the distribution is a normal distribution. 
+
+- Because the result from the shapiro test shows that p-value is extremely small (< 0.01), we reject the null hypothesis that our distribution fits the normal distribution. So we can conclude that it does not fit the normal distribution.
+
+
+
+1.3 A means to an end
+
+```{r}
+
+meandist <- c()
+
+for (i in 1:5000) {
+  meandist[i] <-mean(sample(rdist, 100, replace = T))
+}
+
+hist(meandist, main = "Histogram of Sampled Mean Distribution", xlab = "Means")
+
+shapiro.test(meandist)
+
+qqplot(rdist, meandist, main = "qqplot of Random Distribution and Mean Sampling Distribution", xlab = "Random Distribution", ylab = "Mean Sampling Distribution")
+
+```
+
+- Because the result from the shapiro test shows that p-value is around 0.75 (> 0.05), we fail to reject the null hypothesis that our distribution fits the normal distribution. So we can conclude that the mean distribution is standard normal distribution.
+
+- The qqplot tests for the normal distribution: if the qqplot shows a straight line, then the two samples are standard normal distributions, whereas if it shows a curve, then at least one of the samples is not a normal distribution. Since the mean distribution shows a curve, we can check that rdist is not a normal distribution but meandist is.
+
+#2. Lactose
+
+The file “lactase_haplotype.txt” has haplotype information for the C/T-13910 SNP in the Finnish population. Read in and store this data.
+
+```{r}
+
+lactase <- read.table("lactase_haplotypes.txt", header = T)
+
+```
+
+Calculate genetic diversity for each SNP 1-6. aggregate() is useful here to pull together the numbers by each marker.
+
+```{r}
+
+1 - sum((aggregate(N~SNP1, lactase, sum)$N / 106)^2)
+
+1 - sum((aggregate(N~SNP2, lactase, sum)$N / 106)^2)
+
+1 - sum((aggregate(N~SNP3, lactase, sum)$N / 106)^2)
+
+1 - sum((aggregate(N~SNP4, lactase, sum)$N / 106)^2)
+
+1 - sum((aggregate(N~SNP5, lactase, sum)$N / 106)^2)
+
+1 - sum((aggregate(N~SNP6, lactase, sum)$N / 106)^2)
+
+```
+
+Determine linkage disequilibrium between each marker of haplotype A and the T allele for the C/T-13910 SNP using the D statistic. 
+
+-- SNP1
+```{r}
+
+aggregate(N~SNP1, lactase, sum)
+aggregate(N~C.T.13910, lactase, sum)
+
+A1 <- 70/106
+CTT <- 73/106
+
+aggregate(N~SNP1:C.T.13910, lactase, sum)
+
+A1CTT <- 50/106
+
+result1 <- A1CTT - A1 * CTT
+
+```
+
+-- SNP2
+```{r}
+
+aggregate(N~SNP2, lactase, sum)
+aggregate(N~C.T.13910, lactase, sum)
+
+A2 <- 72/106
+CTT <- 73/106
+
+aggregate(N~SNP2:C.T.13910, lactase, sum)
+
+A2CTT <- 64/106
+
+result2 <- A2CTT - A2 * CTT
+
+```
+
+-- SNP3
+```{r}
+
+aggregate(N~SNP3, lactase, sum)
+aggregate(N~C.T.13910, lactase, sum)
+
+A3 <- 73/106
+CTT <- 73/106
+
+aggregate(N~SNP3:C.T.13910, lactase, sum)
+
+A3CTT <- 73/106
+
+result3 <- A3CTT - A3 * CTT
+
+```
+
+-- SNP4
+```{r}
+
+aggregate(N~SNP4, lactase, sum)
+aggregate(N~C.T.13910, lactase, sum)
+
+A4 <- 73/106
+CTT <- 73/106
+
+aggregate(N~SNP4:C.T.13910, lactase, sum)
+
+A4CTT <- 73/106
+
+result4 <- A4CTT - A4 * CTT
+
+```
+
+-- SNP5
+```{r}
+
+aggregate(N~SNP5, lactase, sum)
+aggregate(N~C.T.13910, lactase, sum)
+
+A5 <- 80/106
+CTT <- 73/106
+
+aggregate(N~SNP5:C.T.13910, lactase, sum)
+
+A5CTT <- 64/106
+
+result5 <- A5CTT - A5 * CTT
+
+```
+
+-- SNP6
+```{r}
+
+aggregate(N~SNP6, lactase, sum)
+aggregate(N~C.T.13910, lactase, sum)
+
+A6 <- 69/106
+CTT <- 73/106
+
+aggregate(N~SNP6:C.T.13910, lactase, sum)
+
+A6CTT <- 41/106
+
+result6 <- A6CTT - A6 * CTT
+
+```
+
+
+Plot the linkage disequilibrium D (calculated above) between SNP T-13910 and the adjacent markers. Assume even spacing of the markers.
+
+```{r}
+
+dV <- c(result1, result2, result3, result4, result5, result6)
+
+plot(dV, main = "Linkage Disequilibrium between SNP T-13910 and Adjacent markers", xlab = "SNP", ylab = "Linkage Disequilibrium")
+
+```
+
+#3. Chopping up characters
+
+Read in the file “SequenceData.txt”. This file contains sequences (each 50 bp long) from 100 individuals.
+
+```{r}
+
+seq <- read.table("SequenceData.txt")
+
+```
+
+How many unique haplotypes does the data contain? 
+
+```{r}
+
+table(seq)
+
+length(table(seq))
+
+```
+-- Therefore, 38 unique haplotypes exist in this data.
+
+
+How many segregating (polymorphic) sites does the data contain?
+
+```{r}
+
+seq1 <- t(apply(seq, 1, function(x) {
+  unlist(strsplit(x, ""))
+}))
+
+seq2 <- data.frame(seq1)
+
+seq3 <- apply(seq2, 2, function(x) {
+  length(table(x))
+})
+
+seq3
+
+```
+
+-- >1 means polymorphic. Therefore, this data contains 36 polymorphic sites.
+
+Calculate genetic diversity for the each nucleotide position in the sequence. 
+```{r}
+
+final <- c()
+
+for (k in 1:50) {
+
+  a = 0
+  t = 0
+  c = 0
+  g = 0
+  
+  for (i in 1:100) {
+    if (seq1[i, k] == "A") {
+      a = a + 1
+    }
+    if (seq1[i, k] == "T") {
+      t = t + 1
+    }
+    if (seq1[i, k] == "C") {
+      c = c + 1
+    }
+    if (seq1[i, k] == "G") {
+      g = g + 1
+    }
+  }
+  
+  result = 1 - ((a/100)^2 + (t/100)^2 + (c/100)^2 + (g/100)^2)
+  final[k] <- result
+}
+
+final
+```
+
+-- The variable final stores the genetic diversities for each nucleotide position in the sequence.
