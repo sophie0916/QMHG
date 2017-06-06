@@ -1,0 +1,221 @@
+---
+title: "Week11 Assignment"
+author: "Sophie Kim"
+date: "April 28, 2016"
+output: html_document
+---
+--------------------------------------------------------------------------------------------------------------
+
+#1. Narrow and broad heritability, sans lm()
+
+Using the data in ParentChildHeight.txt, let’s estimate the narrow sense heritability of height. Without using the function lm() (but you may use any of the other built in R functions):
+
+Compute the intercept and the slope of the regression line.
+```{r}
+pcdata <- read.table("ParentChildHeight.txt", header = TRUE)
+
+parent <- c()
+
+n <- length(pcdata$parent1)
+
+for (i in 1:n){
+  parent[i] <- (pcdata[i,1] + pcdata[i,2])/2
+}
+
+child <- pcdata$child
+
+slope <- cov(parent, child) / var(parent)
+
+intercept <- mean(child) - slope * mean(parent)
+```
+
+Calculate the residuals, so one for for each observation in the dataset.
+```{r}
+residual <- c()
+
+for (i in 1:n){
+  residual[i] <- child[i] - (slope * parent[i] + intercept)
+}
+
+head(residual)
+```
+
+Compute the residual mean square (MSresidual).
+```{r}
+MSresidual <- sum(residual^2) / (n - 2)
+MSresidual
+```
+
+Compute the standard error of the slope.
+
+```{r}
+SSxx <- 0
+for (i in 1:n){
+  SSxx <- SSxx + (parent[i] - mean(parent))^2
+}
+
+SEreg <- sqrt(MSresidual) / sqrt(SSxx)
+SEreg
+```
+
+Compute \(R^2\).
+```{r}
+SSyy <- 0
+SSres <- 0
+
+for (i in 1:n) {
+  SSyy <- SSyy + (child[i] - mean(child))^2
+  SSres <- SSres + (child[i] - (slope * parent[i] + intercept))^2
+}
+
+Rsquared <- 1- (SSres / SSyy)
+Rsquared
+```
+
+>> 1.1 Use a t-test to test significance
+
+State the null and alternative hypothesis. 
+
+- H0: The heights of parents and that of children do not differ.
+
+- HA: The heights of children differ significantly from that of their parents.
+
+
+Calculate the value of the t-statistic and its degrees of freedom.
+```{r}
+b <- slope
+SEb <- sqrt(MSresidual/SSxx)
+tstat <- b / SEb
+tstat
+```
+
+Calculate the corresponding p-value and interpret the result.
+```{r}
+df = n - 2
+1 - pt(tstat, df)
+```
+- Since the pvalue for this t statistic is 0, we reject the null. Therefore, there is a significant difference between the height of a children and the height of their parents.
+
+
+>> 1.2 Perform an ANOVA to evaluate the slope of the regression line
+
+Calculate the ratio of the residual mean square of the data to the residual mean square of the regression.
+```{r}
+MSreg <- 0
+
+for (i in 1:n) {
+  MSreg <- MSreg + (child[i] - mean(child))^2
+}
+
+MSregression <- MSreg / (n-2)
+
+Fstatistic <- MSresidual / MSregression
+Fstatistic
+```
+
+Evaluate the significance of this result by comparing it to the F-statistic distribution, by calculating the p-value.
+```{r}
+pval <- 1 - pf(Fstatistic, n-2, n-2)
+pval
+```
+- Since the p-value for this F statistic is 1, we fail to reject the null.??????????????????
+??????????????????
+?????????????????????????????????????
+???????????????????????????
+??????????????????????????????
+???????????????????????
+
+Compare your calculations to values calculated using the function lm(). Try wrapping in summary().
+```{r}
+summary(lm(child ~ parent))
+```
+
+Plot the data and regression line.
+```{r}
+plot(parent, child, main = "Parent vs. Child Height", xlab = "Parent", ylab = "Child")
+abline(intercept, slope)
+```
+
+What is the narrow-sense heritability of height? 
+```{r}
+h <- slope
+h
+```
+
+
+#2. Using lm()
+
+The file genesMelt.txt contains time series data for the expression of four transcripts. The data is organized so that each row is an observation of a certain gene at a certain time, and we observe a certain value.
+
+Perform least squares regression for each gene’s expression explained by time.
+
+```{r}
+gdata <- read.table("genes.txt", header = T)
+
+time <- gdata$time
+gene1 <- gdata$gene1
+gene2 <- gdata$gene2
+gene3 <- gdata$gene3
+gene4 <- gdata$gene4
+
+summary(lm(gene1 ~ time))
+summary(lm(gene2 ~ time))
+summary(lm(gene3 ~ time))
+summary(lm(gene4 ~ time))
+
+```
+-- Gene1: intecept = 3.0541, slope = 1.6014, significance of the regression slope: 0.0156 
+
+-- Gene2: intecept = 2.2432, slope = 1.5811, significance of the regression slope: 0.0982
+
+-- Gene3: intecept = 5.47973, slope = 0.36824, significance of the regression slope: 0.0201
+
+-- Gene4: intecept = 4.9054, slope = 0.3851, significance of the regression slope: 0.1751
+
+
+Plot the data and regression line for each gene.
+
+```{r}
+plot(time, gene1, main = "Gene I", xlab = "Time", ylab = "Value of Gene 1 Observed")
+int1 <- 3.0541 
+slope1 <- 1.6014
+abline(int1, slope1)
+```
+
+```{r}
+plot(time, gene1, main = "Gene II", xlab = "Time", ylab = "Value of Gene 2 Observed")
+int2 <- 2.2432 
+slope2 <- 1.5811
+abline(int2, slope2)
+```
+
+```{r}
+plot(time, gene1, main = "Gene III", xlab = "Time", ylab = "Value of Gene 3 Observed")
+int3 <- 5.47973
+slope3 <- 0.36824
+abline(int3, slope3)
+```
+
+```{r}
+plot(time, gene1, main = "Gene IV", xlab = "Time", ylab = "Value of Gene 4 Observed")
+int4 <- 4.9054 
+slope4 <- 0.3851
+abline(int4, slope4)
+```
+
+
+```{r}
+plot(time, gene1, main = "Gene vs. Time", xlab = "Time", ylab = "Value of Genes Observed", col = "red")
+
+points(time, gene2, col = "orange")
+points(time, gene3, col = "green")
+points(time, gene4, col = "blue")
+
+abline(int1, slope1, col = "red")
+abline(int2, slope2, col = "orange")
+abline(int3, slope3, col = "green")
+abline(int4, slope4, col = "blue")
+
+legend("topleft", c("Gene I","Gene II", "Gene III", "Gene IV"), lty = c(1, 1), lwd = c(1, 1), col=c("red", "orange", "green", "blue"))
+
+```
