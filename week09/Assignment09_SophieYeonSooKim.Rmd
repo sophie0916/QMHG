@@ -1,0 +1,242 @@
+---
+title: "Week09 Assignment"
+author: "Sophie Kim"
+date: "April 19, 2016"
+output: html_document
+---
+-----------------------------------------------------------------------------------------------------------------------
+
+#1. t-test from scratch
+
+> 1.1 tumor42
+
+Hypotheses:
+
+- H_0: The expression level of gene tumor42 is the same in tumor tissues as those in surrounding tissues.
+
+- H_A: The expression level of gene tumor42 is "not" the same in tumor tissues as those in surrounding tissues.
+
+
+Without using the function t.test(), compute the appropriate t-statistic for testing your two hypotheses. 
+
+```{r}
+
+tdata <- read.csv("tumor.txt", header = F)
+
+ybar <- mean(tdata$V1)
+m <- 0
+SEy <- sd(tdata$V1) / sqrt(length(tdata$V1))
+
+tstat <- (ybar - m) / SEy
+
+tstat
+
+```
+
+Without using the function t.test(), compute the p-value.
+
+```{r}
+
+df <- length(tdata$V1) - 1
+
+pval <- 1- pt(tstat, df) + pt(-tstat,df)
+
+pval
+
+```
+- Since p-value = 0.008128633, reject the null hypothesis: The expression level of gene tumor42 is "not" the same in tumor tissues as those in surrounding tissues.
+
+Without using the function t.test(), compute the 95% confidence interval. 
+
+```{r}
+
+itv <- qt(0.025, df = 19) * SEy
+
+lbound <- ybar + itv
+ubound <- ybar - itv
+
+lbound
+ubound
+
+```
+- 95% Confidence Interval: (0.1768427, 1.035482)
+
+
+Compare your results to a test performed with the function t.test().
+
+```{r}
+
+t.test(tdata$V1, alternative = "two.sided")
+
+```
+- The manually handled t-test coincides with the test performed with t.test() function.
+
+
+> 1.2 study24.7
+
+The file test.txt contains test scores for 100 students. The students are divided into two groups based on their genotype at the study24.7 locus. You want to perform a test to evaluate whether a student’s genotype at the study24.7 locus is strongly associated with an effect on test score.
+
+What is your null hypothesis? What is your alternative hypothesis? Define this numerically.
+
+- H0: A student's genotype at the study24.7 locus is not associated with an effect on test score.   i.e. x̄_1 - x̄_2 = 0
+
+- HA: A student's genotype at the study24.7 locus is associated with an effect on test score    i.e. x̄_1 - x̄_2 != 0
+
+
+Without using the function t.test(), compute the appropriate t-statistic and p-value, assuming the variance is the same in both populations. 
+
+```{r}
+
+gdata <- read.table("test.txt", header = T)
+
+g1 <- na.omit(gdata$TT)
+g2 <- gdata$AT
+
+m1 <- mean(g1)
+m2 <- mean(g2)
+
+n1 <- length(g1)
+n2 <- length(g2)
+
+df1 <- n1-1
+df2 <- n2-1
+
+var1 <- var(g1)
+var2 <- var(g2)
+
+sp <- (df1*var1 + df2*var2) / (df1 + df2)
+
+SE <- sqrt(sp * ( 1/n1 + 1/n2))
+
+t <- (m1 - m2) / SE
+
+tpval <- 1- pt(t, df1+df2) + pt(-t,df1+df2)
+
+tpval
+
+```
+- Since the p-value is 0.07473282, fail to reject the null.
+
+
+Compare this result to a test performed with the function t.test(). 
+
+```{r}
+
+t.test(g1, g2, alternative = "two.sided", var.equal = T)
+
+```
+- The manually handled t-test coincides with the test performed with t.test() function.
+
+
+Compare this result to performing the test (you can use t.test() without assuming the variance is the same in both populations. How does this change the significance of your result, and why?
+
+```{r}
+
+t.test(g1, g2, alternative = "two.sided")
+
+```
+- Without the assumption that the variance is the same in both populations, the t.test() function calculates the t-statistic and the degree of freedom in a different manner, resulting in a p-value, and hence the 95% confidence interval that deviate from the ones calculated manually.
+
+
+
+#2. Empirical two-sample t-statistic distributions
+
+> 2.1 when the null hypothesis is correct:
+
+Create one population (Population Zed) of Normally distributed random values.
+
+- Sample size: 10000
+
+- Mean: 500
+
+```{r}
+
+zed <- rnorm(10000, 500)
+
+```
+
+Take two different samples from your Population Zed and compute the t-statistic. 
+
+```{r}
+
+samplet <- c()
+
+for (i in 1:10000) {
+  s1 <- sample(zed, 100)
+  s2 <- sample(zed, 100)
+  samplet[i] <- t.test(s1, s2, var.equal = T)$statistic
+}
+
+```
+
+Calculate the 5% threshold values of the resulting empirical t-distribution assuming a two-sided test.
+
+```{r}
+
+threshold <- quantile(zed, c(0.025, 0.975))
+threshold
+
+```
+
+Compare these thresholds to the corresponding theoretical t-value distribution.
+
+```{r}
+
+500 + qt(0.025, df = 198)
+
+500 + qt(0.975, df = 198)
+
+```
+-Note: the 500 is added, because this number represents the mean
+
+- It can be observed that the calculated thresholds and the corresponding theoretical t-value istribution are numerically very close.
+
+> 2.2 when the null hypothesis is not correct:
+
+Create another population (Population Equis) of normally distributed values with a different mean than Populaion Zed. 
+
+To empirically determine the distribution of t-statistics between samples of Zed and samples of Equis, sample once from each of your populations and compute the t statistic for the assumption that the two samples come from populations with the same mean. 
+
+- Sample size: 10000
+
+- Mean: 500.5
+
+```{r}
+
+equis <- rnorm(10000, 500.5)
+
+sample <- c()
+
+for (i in 1:10000) {
+  s1 <- sample(zed, 100)
+  s2 <- sample(equis, 100)
+  sample[i] <- t.test(s1, s2, var.equal = T)$statistic
+}
+
+```
+
+Plot both t-statistic distributions generated for sampling from the same or different distributions. 
+
+```{r}
+
+plot(density(samplet), main = "t-test for same/different distributions", xlab = "t-score", col = "red")
+
+lines(density(sample), col = "blue")
+
+legend("topright", c("Same","Different"), lty = c(1, 1), lwd = c(1, 1), col=c("red", "blue"))
+
+```
+
+Calculate how many values (as a percentage) in your second distribution of t statistics (comparing Zed and Equis) are more extreme than the threshold value calculated for just the Population Zed t-statistics. 
+
+```{r}
+
+sum(equis < 498.0461) + sum(equis > 501.9286)
+
+```
+
+Identify (state in words) the regions relative to these threshold values that represent a type I error and a type II error.
+
+- Type I Error is a false positive of rejecting the correct null hypothesis. This corresponds to the lefthand tail of the same-mean distribution, starting from its lower bound of the 95% confidence interval.
+
+- Type II Error is a false negative of failing to reject the null hypothesis. This corresponds to the area under the different-mean distribution (blue line) starting from the lower bound of the 95% confidence level of the same-mean distribution upto the righthand tail.
