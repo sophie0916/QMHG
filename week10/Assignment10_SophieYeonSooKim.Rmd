@@ -1,0 +1,191 @@
+---
+title: "Week10 Assignment"
+author: "Sophie Kim"
+date: "April 27, 2016"
+output: html_document
+---
+-------------------------------------------------------------------------------------------------------------------
+
+#1. First grouping, and a manual calculation
+
+
+```{r}
+
+hw <- read.table("heightweight.txt", header = T)
+
+AA <- subset(hw, Genotype == "AA")
+AG <- subset(hw, Genotype == "AG")
+GG <- subset(hw, Genotype == "GG")
+
+plot(AA$Weight, AA$Height, main = "Weight vs. Height for AA genotype", xlab = "Weight", ylab = "Height", type = "p")
+plot(AG$Weight, AG$Height, main = "Weight vs. Height for AG genotype", xlab = "Weight", ylab = "Height", type = "p")
+plot(GG$Weight, GG$Height, main = "Weight vs. Height for GG genotype", xlab = "Weight", ylab = "Height", type = "p")
+
+```
+
+Without using the aov() function, perform a separate analysis of variance on the heights and weights of the individuals as grouped by their SNP genotype, following the steps below. subset(), for loops, or aggregate() are useful for separating the groups.
+
+- Compute the error mean square for Height:
+
+```{r}
+emsH <- 0
+
+for (i in 1:length(AA$Height)){
+  temp <- AA[i,1] - mean(AA$Height)
+  emsH <- emsH + temp^2
+}
+
+for (i in 1:length(AG$Height)){
+  temp <- AG[i,1] - mean(AG$Height)
+  emsH <- emsH + temp^2
+}
+
+for (i in 1:length(GG$Height)){
+  temp <- GG[i,1] - mean(GG$Height)
+  emsH <- emsH + temp^2
+}
+
+emsH <- emsH/(length(hw$Height)-3)
+
+emsH
+```
+
+- Compute the error mean square for Weight:
+```{r}
+emsW <- 0
+
+for (i in 1:length(AA$Weight)){
+  temp <- AA[i,2] - mean(AA$Weight)
+  emsW <- emsW + temp^2
+}
+
+for (i in 1:length(AG$Weight)){
+  temp <- AG[i,2] - mean(AG$Weight)
+  emsW <- emsW + temp^2
+}
+
+for (i in 1:length(GG$Weight)){
+  temp <- GG[i,2] - mean(GG$Weight)
+  emsW <- emsW + temp^2
+}
+
+emsW <- emsW/(length(hw$Weight)-3)
+
+emsW
+```
+
+- Compute the group mean square for Height: 
+```{r}
+gmshAA <- mean(AA$Height) - mean(hw$Height)
+gmshAG <- mean(AG$Height) - mean(hw$Height)
+gmshGG <- mean(GG$Height) - mean(hw$Height)
+
+gmsH <- (10*gmshAA^2 + 10*gmshAG^2 + 10*gmshGG^2)/(3-1)
+
+gmsH
+```
+
+- Compute the group mean square for Weight: 
+```{r}
+gmswAA <- mean(AA$Weight) - mean(hw$Weight)
+gmswAG <- mean(AG$Weight) - mean(hw$Weight)
+gmswGG <- mean(GG$Weight) - mean(hw$Weight)
+
+gmsW <- (10*gmswAA^2 + 10*gmswAG^2 + 10*gmswGG^2)/(3-1)
+
+gmsW
+```
+
+- Compute the F statistic and its appropriate p-value for Height. 
+```{r}
+FH <- gmsH/emsH
+pvalH <- 1-pf(FH, 2, 27)
+```
+- The F statistic for Height is 1897.88, and the corresponding p-value is 0.
+
+- Compute the F statistic and its appropriate p-value for Weight. 
+```{r}
+FW <- gmsW/emsW
+pvalW <- 1-pf(FW, 2, 27)
+```
+- The F statistic for Weight is 1.333034, and the corresponding p-value is 0.2804793
+
+
+#2. And compare to the automatic function
+
+```{r}
+summary(aov(Height ~ Genotype, hw))
+summary(aov(Weight ~ Genotype, hw))
+```
+- The results coincide with manual calculation of the F statistics and the p-values.
+
+- Based on the results, we can conclude that height is significantly affected by genotype, whereas there is no relationship between genotype and weight.
+
+
+#3. Plotting, a choice
+
+Plot the individual data points with the group and grand means of the weights and heights according to genotype. 
+
+```{r}
+boxplot(Height ~ Genotype, hw, main = "Boxplots of Heights by Genotype", xlab = "Genotype", ylab = "Height (cm)")
+boxplot(Weight ~ Genotype, hw, main = "Boxplots of Weights by Genotype", xlab = "Genotype", ylab = "Weight (lb)")
+```
+
+#4. Linear thinking
+
+Without using cor() or cov(), calculate the linear correlation coefficient between weight and height for each genotype group separately. Feel free to recycle code/strategy from the first part for the grouping. What are your conclusions?
+
+- Devise a function that manually calculates the linear correlation coefficient getr()
+```{r}
+getr <- function(genotype){
+  cov <- 0
+  
+  for (i in 1:10) {
+    cov <- cov + (genotype[i,1] - mean(genotype$Height)) * (genotype[i,2] - mean(genotype$Weight))
+  }
+  
+  r <- cov / (sd(genotype$Height) * sd(genotype$Weight))
+  
+  sh <- 0
+  for (i in 1:10) {
+    sh <- sh + (genotype[i,1] - mean(genotype$Height))^2
+  }
+  
+  sw <- 0
+  for (i in 1:10) {
+    sw <- sw + (genotype[i,2] - mean(genotype$Weight))^2
+  }
+  
+  r <- cov / (sqrt(sh)*sqrt(sw))
+  return(r)
+}
+
+```
+
+- Linear Correlation Coefficient for AA genotype
+```{r}
+rAA <- getr(AA)
+rAA
+```
+
+- Linear Correlation Coefficient for AG genotype
+```{r}
+rAG <- getr(AG)
+rAG
+```
+
+- Linear Correlation Coefficient for GG genotype
+```{r}
+rGG <- getr(GG)
+rGG
+```
+
+
+Compare your results to a test performed using the function cor.test(). 
+
+```{r}
+cor.test(~ Height + Weight, AA)
+cor.test(~ Height + Weight, AG)
+cor.test(~ Height + Weight, GG)
+```
+- The results coincide with manual calculation of the linear correlation coefficients of each genotype.
